@@ -9,16 +9,7 @@ environment:
     matrix:
         - VSVER: 15
 
-configuration:
-    - shared
-
 before_build:
-    - ps: >-
-        Install-Module VSSetup -Scope CurrentUser
-    - ps: >-
-        Get-VSSetupInstance -All
-    - ps: >-
-        gci env:* | sort-object name
     - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" amd64
     - mkdir _build
     - cd _build
