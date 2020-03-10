@@ -3,7 +3,6 @@ image:
 
 platform:
     - x64
-    - x86
 
 environment:
     fast_finish: true
@@ -12,8 +11,6 @@ environment:
 
 configuration:
     - shared
-    - plain
-    - minimal
 
 before_build:
     - ps: >-
@@ -44,34 +41,16 @@ before_build:
     - perl ..\Configure %TARGET% %SHARED%
     - perl configdata.pm --dump
     - cd ..
-    - ps: >-
-        if (-not $env:APPVEYOR_PULL_REQUEST_NUMBER`
-            -or (&git log -2 | Select-String "\[extended tests\]") ) {
-            $env:EXTENDED_TESTS="yes"
-        }
 
 build_script:
     - cd _build
-    - ps: >-
-        If ($env:Configuration -Match "shared" -or $env:EXTENDED_TESTS) {
-            cmd /c "nmake build_all_generated 2>&1"
-            cmd /c "nmake PERL=no-perl 2>&1"
-        }
+    - cmd /c "nmake build_all_generated 2>&1"
+    - cmd /c "nmake PERL=no-perl 2>&1"
     - cd ..
 
 test_script:
     - cd _build
-    - ps: >-
-        If ($env:Configuration -Match "shared" -or $env:EXTENDED_TESTS) {
-            if ($env:EXTENDED_TESTS) {
-                cmd /c "nmake test HARNESS_VERBOSE_FAILURE=yes 2>&1"
-            } Else {
-                cmd /c "nmake test HARNESS_VERBOSE_FAILURE=yes TESTS=-test_fuzz 2>&1"
-            }
-        }
-    - ps: >-
-        if ($env:EXTENDED_TESTS) {
-            mkdir ..\_install
-            cmd /c "nmake install DESTDIR=..\_install 2>&1"
-        }
+    - cmd /c "nmake test HARNESS_VERBOSE_FAILURE=yes TESTS=-test_fuzz 2>&1"
+    - mkdir ..\_install
+    - cmd /c "nmake install DESTDIR=..\_install 2>&1"
     - cd ..
